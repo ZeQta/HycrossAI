@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ZeQta AI - Matrix Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Google Font for a clean, monospaced look -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" />
+  <style>
+    /* Reset and base */
+    * {
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Roboto Mono', monospace;
+      background: #000; /* We'll have a canvas on top for the matrix effect */
+      color: #00ffbf;
+      overflow: hidden; /* so we don't scroll the body itself */
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Matrix Canvas */
+    #matrixCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1; /* behind the chat container */
+    }
+
+    /* Main chat container - sits on top of canvas */
+    .chat-wrapper {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6); /* translucent background */
+    }
+
+    /* Header / Title */
+    .chat-header {
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      font-size: 1.25rem;
+      text-align: center;
+      border-bottom: 1px solid #00ffbf;
+    }
+
+    /* Chat container (scrollable) */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .message {
+      max-width: 80%;
+      margin-bottom: 15px;
+      padding: 10px 15px;
+      border-radius: 6px;
+      line-height: 1.4;
+      color: #fff;
+      background: rgba(0, 255, 191, 0.2);
+      border: 1px solid rgba(0, 255, 191, 0.4);
+    }
+    .user {
+      align-self: flex-end;
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Input area */
+    .chat-input-area {
+      display: flex;
+      flex-direction: column;
+      background: rgba(0, 0, 0, 0.8);
+      border-top: 1px solid #00ffbf;
+      padding: 10px;
+    }
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .suggestion-btn {
+      padding: 5px 10px;
+      background: rgba(0, 255, 191, 0.2);
+      border: 1px solid rgba(0, 255, 191, 0.5);
+      color: #00ffbf;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    .suggestion-btn:hover {
+      background: rgba(0, 255, 191, 0.4);
+    }
+
+    .input-row {
+      display: flex;
+      width: 100%;
+      gap: 10px;
+    }
+    .prompt-input {
+      flex: 1;
+      border: 1px solid rgba(0, 255, 191, 0.4);
+      background: rgba(0, 0, 0, 0.8);
+      color: #00ffbf;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 1rem;
+      outline: none;
+    }
+    .prompt-input::placeholder {
+      color: #00ffbf;
+      opacity: 0.6;
+    }
+    .send-btn {
+      background: #00ffbf;
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .send-btn:hover {
+      background: #00d8a7;
+    }
+    .send-btn:disabled {
+      background: #666;
+      cursor: not-allowed;
+    }
+
+    /* Loading text */
+    #loading {
+      text-align: center;
+      color: #ddd;
+      display: none;
+      margin-top: 10px;
+    }
+
+    /* Mobile-friendly adjustments */
+    @media (max-width: 600px) {
+      .message {
+        max-width: 90%;
+        font-size: 0.9rem;
+      }
+      .chat-header {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Matrix background -->
+  <canvas id="matrixCanvas"></canvas>
+
+  <!-- Chat container -->
+  <div class="chat-wrapper">
+    <div class="chat-header">ZeQta AI - Matrix Mode</div>
+    <div id="chatMessages" class="chat-messages"></div>
+
+    <div class="chat-input-area">
+      <!-- Prompt Suggestions (clickable) -->
+      <div class="suggestions">
+        <button class="suggestion-btn">What can you do?</button>
+        <button class="suggestion-btn">Tell me a joke</button>
+        <button class="suggestion-btn">Explain AI in simple terms</button>
+        <button class="suggestion-btn">Generate a short story</button>
+      </div>
+
+      <div class="input-row">
+        <input
+          type="text"
+          id="prompt"
+          class="prompt-input"
+          placeholder="Type your question..."
+        />
+        <button id="sendBtn" class="send-btn">Send</button>
+      </div>
+      <div id="loading">Sending...</div>
+    </div>
+  </div>
+
+  <script>
+    /************* MATRIX BACKGROUND *************/
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    // Characters to display
+    const matrixChars = ['0','1'];
+    const fontSize = 16;
+    let columns;
+    let drops = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      width = canvas.width;
+      height = canvas.height;
+      columns = Math.floor(width / fontSize);
+      drops = [];
+      for (let i = 0; i < columns; i++) {
+        drops[i] = Math.random() * height;
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = '#00ffbf';
+      ctx.font = fontSize + 'px "Roboto Mono"';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+        ctx.fillText(text, i * fontSize, drops[i]);
+        drops[i] += fontSize;
+        if (drops[i] > height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+      }
+    }
+
+    function initMatrix() {
+      resizeCanvas();
+      setInterval(drawMatrix, 50);
+    }
+    initMatrix();
+
+    /************* CHAT FUNCTIONALITY *************/
+    const API_KEY = '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'; // <-- Replace with your actual key
+    const chatMessages = document.getElementById('chatMessages');
+    const promptInput = document.getElementById('prompt');
+    const sendBtn = document.getElementById('sendBtn');
+    const loadingDiv = document.getElementById('loading');
+
+    // Utility to add messages to the chat
+    function addMessage(content, isUser = false) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message');
+      if (isUser) {
+        msgDiv.classList.add('user');
+      }
+      msgDiv.textContent = content;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Handle sending user prompt
+    async function sendPrompt() {
+      const prompt = promptInput.value.trim();
+      if (!prompt) return;
+
+      addMessage(prompt, true);
+      promptInput.value = '';
+
+      loadingDiv.style.display = 'block';
+      sendBtn.disabled = true;
+
+      try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'mistralai/mistral-7b-instruct:free',
+            messages: [{ "role": "user", "content": prompt }]
+          })
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        const aiText = data.choices?.[0]?.message?.content || 'No response text found.';
+        addMessage(aiText);
+      } catch (err) {
+        console.error(err);
+        addMessage('Error: Could not fetch AI response. Check console.', false);
+      } finally {
+        loadingDiv.style.display = 'none';
+        sendBtn.disabled = false;
+      }
+    }
+
+    // Send button click
+    sendBtn.addEventListener('click', sendPrompt);
+
+    // Press Enter to send
+    promptInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        sendPrompt();
+      }
+    });
+
+    // Suggestion buttons
+    document.querySelectorAll('.suggestion-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        promptInput.value = btn.textContent;
+        sendPrompt();
+      });
+    });
+  </script>
+</body>
+</html>
