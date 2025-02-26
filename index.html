@@ -2,18 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hycross AI Chat with Open Router</title>
-  <!-- Tailwind CSS CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hycross AI - Cyberpunk Edition</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+  />
   <style>
-    /* Cyberpunk Theme Styles */
+    /* Cyberpunk theme */
     body {
-      background: #0a0a0a;
+      background-color: #0a0a0a;
       color: #0ff;
       font-family: 'Roboto', sans-serif;
     }
+
     /* Scrollbar customization */
     ::-webkit-scrollbar {
       width: 8px;
@@ -22,47 +26,61 @@
       background-color: rgba(0, 255, 255, 0.5);
       border-radius: 4px;
     }
-    /* Button animations */
+
+    /* Neon glow on hover/click */
     .cyber-button {
-      transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .cyber-button:hover {
+      box-shadow: 0 0 8px #0ff;
     }
     .cyber-button:active {
       transform: scale(0.95);
+      box-shadow: 0 0 12px #0ff;
+    }
+
+    /* Category buttons */
+    .category-btn {
+      background-color: #111;
+      border: 2px solid #0ff;
+      color: #0ff;
+      transition: background-color 0.3s;
+    }
+    .category-btn:hover {
+      background-color: #0ff;
+      color: #0a0a0a;
       box-shadow: 0 0 10px #0ff;
     }
-    /* Input styling */
-    .cyber-input {
-      background-color: #1a1a1a;
-      border: 1px solid #0ff;
-      color: #0ff;
-    }
+
     /* Chat bubbles */
     .user-message {
       background-color: #0ff;
       color: #0a0a0a;
-      box-shadow: 0 0 10px #0ff;
+      box-shadow: 0 0 8px #0ff;
     }
     .assistant-message {
       background-color: #1a1a1a;
       color: #0ff;
       border: 1px solid #0ff;
-      box-shadow: 0 0 10px #0ff;
+      box-shadow: 0 0 8px #0ff;
     }
-    /* Fade-in animation for chat messages */
+
+    /* Fade-in animation */
     .fade-in {
-      animation: fadeIn 0.5s ease-in-out;
+      animation: fadeIn 0.4s ease-in-out;
     }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    /* Header style with neon gradient */
-    header {
-      background: linear-gradient(45deg, #0ff, #ff0);
-      color: #0a0a0a;
-      box-shadow: 0 0 15px #0ff;
-    }
-    /* Code block customization */
+
+    /* Code blocks */
     pre {
       background-color: #111;
       border: 1px solid #0ff;
@@ -87,110 +105,179 @@
       border-radius: 5px;
       cursor: pointer;
     }
-    .hidden {
-      display: none;
-    }
-    /* Mobile-specific styles */
+
+    /* Chat input pinned at bottom on mobile */
     @media (max-width: 640px) {
-      #chatSection footer {
+      #chatControls {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        z-index: 10;
+        z-index: 50;
         background-color: #0a0a0a;
-        padding: 0.75rem 1rem;
+        padding-bottom: 0.75rem;
       }
-      #chatSection main {
-        padding-bottom: 80px; /* Ensure messages aren't hidden behind the fixed footer */
+      #chatArea {
+        padding-bottom: 6rem; /* so messages aren't hidden behind the controls */
       }
+    }
+
+    /* Modal for API Key */
+    .modal-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: #111;
+      border: 2px solid #0ff;
+      box-shadow: 0 0 10px #0ff;
+      border-radius: 8px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 400px;
     }
   </style>
 </head>
-<body class="transition-colors duration-300">
-  <!-- Main Container -->
-  <div class="min-h-screen flex flex-col items-center py-6">
-    <!-- Setup Section -->
-    <div id="setupSection" class="p-6 flex flex-col space-y-4 w-full max-w-md bg-gray-900 rounded-lg shadow-lg">
-      <div class="flex flex-col space-y-2">
-        <label for="apiKey" class="font-semibold">Open Router API Key:</label>
-        <input type="text" id="apiKey" placeholder="Enter your Open Router API key" class="p-2 cyber-input rounded-md">
-        <button onclick="saveApiKey()" class="p-2 bg-teal-500 text-black rounded-md cyber-button">Save API Key</button>
+<body>
+  <!-- Modal for API Key (hidden by default) -->
+  <div id="apiKeyModal" class="hidden modal-bg">
+    <div class="modal-content">
+      <h2 class="text-xl font-bold mb-4 text-center">Enter Your API Key</h2>
+      <input
+        type="text"
+        id="apiKey"
+        placeholder="OpenRouter API Key"
+        class="w-full p-2 mb-4 cyber-input rounded-md"
+      />
+      <div class="flex justify-center">
+        <button
+          class="p-2 px-4 bg-teal-500 text-black rounded-md cyber-button"
+          onclick="saveApiKey()"
+        >
+          Save
+        </button>
+        <button
+          class="p-2 px-4 ml-2 bg-red-500 text-black rounded-md cyber-button"
+          onclick="toggleApiKeyModal()"
+        >
+          Close
+        </button>
       </div>
-      <div class="flex flex-col space-y-2">
-        <label for="modelSelect" class="font-semibold">Select Model:</label>
-        <select id="modelSelect" onchange="handleModelChange()" class="p-2 cyber-input rounded-md">
-          <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo (openai/gpt-3.5-turbo)</option>
-          <option value="openai/gpt-4">GPT-4 (openai/gpt-4)</option>
-          <option value="anthropic/claude-2">Claude 2 (anthropic/claude-2)</option>
-          <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet (anthropic/claude-3.5-sonnet)</option>
-          <option value="anthropic/claude-3-haiku">Claude 3 Haiku (anthropic/claude-3-haiku)</option>
-          <option value="meta-llama/llama-2-70b-chat">Llama 2 70B Chat (meta-llama/llama-2-70b-chat)</option>
-          <option value="meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B Instruct (meta-llama/llama-3.3-70b-instruct)</option>
-          <option value="deepseek/deepseek-r1">DeepSeek R1 (deepseek/deepseek-r1)</option>
-          <option value="deepseek/deepseek-r1:free">DeepSeek R1 (free) (deepseek/deepseek-r1:free)</option>
-          <option value="mistral/mistral-7b-instruct">Mistral 7B Instruct (mistral/mistral-7b-instruct)</option>
-          <option value="mistral/mistral-7b-instruct:free">Mistral 7B Instruct (free) (mistral/mistral-7b-instruct:free)</option>
-          <option value="mistral/mistral-large">Mistral Large (mistral/mistral-large)</option>
-          <option value="google/gemma-2-9b-it">Gemma 2 9B (google/gemma-2-9b-it)</option>
-          <option value="google/gemma-2-9b-it:free">Gemma 2 9B (free) (google/gemma-2-9b-it:free)</option>
-          <option value="google/gemma-2-27b-it">Gemma 2 27B (google/gemma-2-27b-it)</option>
-          <option value="qwen/qwen-2.5-72b-instruct">Qwen2.5 72B Instruct (qwen/qwen-2.5-72b-instruct)</option>
-          <option value="other">Other (Enter custom model ID)</option>
-        </select>
-        <input type="text" id="customModel" placeholder="Enter custom model ID" class="p-2 cyber-input rounded-md hidden">
-      </div>
-      <button id="startChatButton" onclick="startChat()" class="p-2 bg-green-500 text-black rounded-md cyber-button" disabled>Start Chat</button>
     </div>
+  </div>
 
-    <!-- Chat Section -->
-    <div id="chatSection" class="hidden w-full max-w-3xl flex flex-col mt-6 bg-gray-900 rounded-lg shadow-lg overflow-hidden">
-      <!-- Header -->
-      <header class="p-4 flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <img src="A54C51E0-1217-4CF6-956B-4C75CB05E8F8.webp" alt="Logo" class="rounded-full shadow-lg p-1 w-10 h-10" />
-          <h1 class="text-2xl font-bold">Hycross AI Chat</h1>
-        </div>
-      </header>
+  <!-- Gear icon to open API Key modal -->
+  <div class="absolute top-4 right-4">
+    <button
+      class="cyber-button p-2 bg-gray-800 rounded-full"
+      onclick="toggleApiKeyModal()"
+    >
+      <!-- Gear Icon -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="#0ff"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4.75 15.25l1.664.277a6.522 6.522 0 001.435 2.482l-1.032 1.399A1.75 1.75 0 006.944 22h2.367a1.75 1.75 0 001.39-.672l1.032-1.399a6.52 6.52 0 002.548 0l1.032 1.399c.318.433.82.672 1.39.672h2.367a1.75 1.75 0 001.219-2.822l-1.032-1.399a6.52 6.52 0 001.435-2.482l1.664-.277a1.75 1.75 0 001.502-1.741V9.491a1.75 1.75 0 00-1.502-1.741l-1.664-.277a6.522 6.522 0 00-1.435-2.482l1.032-1.399A1.75 1.75 0 0017.056 2h-2.367a1.75 1.75 0 00-1.39.672l-1.032 1.399a6.52 6.52 0 00-2.548 0L9.687 2.672A1.75 1.75 0 008.296 2H5.93a1.75 1.75 0 00-1.219 2.822l1.032 1.399a6.52 6.52 0 00-1.435 2.482l-1.664.277A1.75 1.75 0 001.75 9.491v3.018c0 .87.626 1.61 1.502 1.741z"
+        />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+    </button>
+  </div>
 
-      <!-- Chat Area -->
-      <main id="chatArea" class="flex-grow p-4 overflow-y-auto space-y-4">
-        <!-- Sample incoming message -->
-        <div class="flex items-start space-x-3 fade-in">
-          <div class="w-10 h-10 bg-blue-500 rounded-full flex-shrink-0"></div>
-          <div class="assistant-message p-3 rounded-lg shadow max-w-md">
-            <p>Hello! How can I assist you today?</p>
-          </div>
-        </div>
-      </main>
+  <!-- Hero / Landing Section -->
+  <section class="flex flex-col items-center justify-center text-center mt-16">
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-8">What can I help with?</h1>
+    <div class="flex flex-wrap gap-4 justify-center mb-12 px-4">
+      <button class="category-btn px-4 py-2 rounded-lg cyber-button">Create Image</button>
+      <button class="category-btn px-4 py-2 rounded-lg cyber-button">Code</button>
+      <button class="category-btn px-4 py-2 rounded-lg cyber-button">Get Advice</button>
+      <button class="category-btn px-4 py-2 rounded-lg cyber-button">Brainstorm</button>
+      <button class="category-btn px-4 py-2 rounded-lg cyber-button">More</button>
+    </div>
+  </section>
 
-      <!-- Chat Input Area -->
-      <footer class="p-4">
-        <div class="flex items-center space-x-2">
-          <!-- Attachment Button -->
-          <button id="attachButton" class="p-2 rounded-full bg-teal-500 cyber-button" onclick="document.getElementById('fileInput').click()">+</button>
-          <!-- File Input (hidden) -->
-          <input type="file" id="fileInput" class="hidden" multiple />
-          <input
-            id="messageInput"
-            type="text"
-            placeholder="Type your message here..."
-            class="flex-grow p-4 cyber-input rounded-full text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
-          />
-          <button
-            id="sendButton"
-            class="w-14 h-14 rounded-full bg-teal-500 cyber-button shadow-xl flex items-center justify-center relative overflow-hidden"
-          >
-            <svg class="relative z-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" width="28" height="28">
-              <path fill-opacity="0.01" fill="white" d="M63.6689 29.0491L34.6198 63.6685L0.00043872 34.6194L29.0496 0L63.6689 29.0491Z"></path>
-              <path stroke-linejoin="round" stroke-linecap="round" stroke-width="3.77" stroke="white" d="M42.85 18.71L21.06 44.67"></path>
-              <path stroke-linejoin="round" stroke-linecap="round" stroke-width="3.77" stroke="white" d="M26.93 20.1L42.85 18.71L44.24 34.62"></path>
-            </svg>
-            <div class="w-full h-full rotate-45 absolute left-[32%] top-[32%] bg-black group-hover:-left-[100%] group-hover:-top-[100%] transition-all duration-500"></div>
-            <div class="w-full h-full -rotate-45 absolute -left-[32%] -top-[32%] bg-black group-hover:left-[100%] group-hover:top-[100%] transition-all duration-500"></div>
-          </button>
+  <!-- Chat Section -->
+  <section id="chatSection" class="w-full max-w-3xl mx-auto bg-gray-900 rounded-lg shadow-lg overflow-hidden hidden">
+    <!-- Chat Area -->
+    <div id="chatArea" class="p-4 overflow-y-auto space-y-4 h-[60vh] sm:h-[70vh]">
+      <!-- Example assistant message -->
+      <div class="flex items-start space-x-3 fade-in">
+        <div class="w-10 h-10 bg-blue-500 rounded-full flex-shrink-0"></div>
+        <div class="assistant-message p-3 rounded-lg shadow max-w-md">
+          <p>Hello! How can I assist you today?</p>
         </div>
-      </footer>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bottom Chat Controls -->
+  <div id="chatControls" class="w-full max-w-3xl mx-auto mt-4">
+    <div class="flex items-center space-x-2 px-4">
+      <!-- Attachment Button -->
+      <button
+        id="attachButton"
+        class="p-2 rounded-full bg-teal-500 cyber-button"
+        onclick="document.getElementById('fileInput').click()"
+      >
+        +
+      </button>
+      <!-- Hidden File Input -->
+      <input
+        type="file"
+        id="fileInput"
+        class="hidden"
+        multiple
+        onchange="onFileSelected(event)"
+      />
+
+      <!-- Input Field -->
+      <div
+        id="messageInputContainer"
+        class="relative flex-grow"
+      >
+        <input
+          id="messageInput"
+          type="text"
+          placeholder="Ask anything..."
+          class="w-full p-4 pr-28 cyber-input rounded-full text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
+        />
+        <!-- Attached File Preview (appears here if user selects files) -->
+        <div
+          id="filePreview"
+          class="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm text-gray-300"
+        ></div>
+      </div>
+
+      <!-- "Search" and "Reason" act like different 'Send' buttons -->
+      <button
+        class="px-4 py-2 bg-teal-500 cyber-button text-black font-bold rounded-lg"
+        onclick="sendMessage('search')"
+      >
+        Search
+      </button>
+      <button
+        class="px-4 py-2 bg-purple-500 cyber-button text-black font-bold rounded-lg"
+        onclick="sendMessage('reason')"
+      >
+        Reason
+      </button>
     </div>
   </div>
 
@@ -201,16 +288,28 @@
     let selectedModel = 'openai/gpt-3.5-turbo';
     let isSending = false;
 
+    // For attachments
+    let selectedFiles = [];
+
+    /* Toggle API Key modal */
+    function toggleApiKeyModal() {
+      const modal = document.getElementById('apiKeyModal');
+      modal.classList.toggle('hidden');
+    }
+
+    /* Save API Key */
     function saveApiKey() {
-      apiKey = document.getElementById('apiKey').value.trim();
+      const keyInput = document.getElementById('apiKey');
+      apiKey = keyInput.value.trim();
       if (!apiKey) {
         alert('Please enter a valid API key.');
         return;
       }
       alert('API key saved successfully.');
-      document.getElementById('startChatButton').disabled = false;
+      toggleApiKeyModal();
     }
 
+    /* Show/hide custom model input */
     function handleModelChange() {
       const modelSelect = document.getElementById('modelSelect').value;
       const customModelInput = document.getElementById('customModel');
@@ -226,26 +325,53 @@
       });
     }
 
-    function startChat() {
-      if (!apiKey) {
-        alert('Please enter and save your API key first.');
-        return;
+    /* When a file is selected, store it and show a quick preview in the input area */
+    function onFileSelected(event) {
+      selectedFiles = [...event.target.files]; // array of files
+      if (selectedFiles.length > 0) {
+        const fileNames = selectedFiles.map(file => file.name).join(', ');
+        document.getElementById('filePreview').innerText = `Attached: ${fileNames}`;
+      } else {
+        document.getElementById('filePreview').innerText = '';
       }
-      document.getElementById('setupSection').classList.add('hidden');
-      document.getElementById('chatSection').classList.remove('hidden');
     }
 
-    // Helper to format code blocks correctly
+    /* Format code blocks for messages */
     function formatCodeBlocks(text) {
       return text.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-        return `<div class="code-block"><pre><code class="language-${lang || 'plaintext'}">${code}</code></pre><button class="copy-button" onclick="copyCode(this)">Copy</button></div>`;
+        return `
+          <div class="relative my-2">
+            <pre><code class="language-${lang || 'plaintext'}">${code}</code></pre>
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+          </div>
+        `;
       });
     }
 
+    /* Copy code from code blocks */
+    function copyCode(button) {
+      const code = button.previousElementSibling.querySelector('code').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Code copied to clipboard!');
+      });
+    }
+
+    /* Reveal the chat section if hidden */
+    function showChatSection() {
+      const chatSection = document.getElementById('chatSection');
+      if (chatSection.classList.contains('hidden')) {
+        chatSection.classList.remove('hidden');
+      }
+    }
+
+    /* Add a message to the chat area */
     function addMessage(content, isUser) {
+      showChatSection(); // Make sure chat is visible
       const chatArea = document.getElementById('chatArea');
       const messageBubble = document.createElement('div');
-      messageBubble.className = isUser ? 'flex justify-end fade-in' : 'flex items-start space-x-3 fade-in';
+      messageBubble.className = isUser
+        ? 'flex justify-end fade-in'
+        : 'flex items-start space-x-3 fade-in';
 
       if (isUser) {
         messageBubble.innerHTML = `
@@ -260,34 +386,50 @@
             <p>${formatCodeBlocks(content)}</p>
           </div>
         `;
-        Prism.highlightAllUnder(messageBubble);
       }
 
       chatArea.appendChild(messageBubble);
+      Prism.highlightAllUnder(messageBubble);
       chatArea.scrollTop = chatArea.scrollHeight;
     }
 
-    function copyCode(button) {
-      const code = button.previousElementSibling.querySelector('code').textContent;
-      navigator.clipboard.writeText(code).then(() => {
-        alert('Code copied to clipboard!');
-      });
-    }
-
-    async function sendMessage() {
+    /* Send message (Search or Reason) */
+    async function sendMessage(mode) {
       if (isSending) return;
-      isSending = true;
-
-      const userInput = document.getElementById('messageInput').value.trim();
-      if (!userInput) {
-        isSending = false;
+      if (!apiKey) {
+        alert('Please set your API key first (gear icon).');
         return;
       }
 
-      addMessage(userInput, true);
-      conversationHistory.push({ role: 'user', content: userInput });
-      document.getElementById('messageInput').value = '';
+      // Gather user input
+      const userInputElem = document.getElementById('messageInput');
+      const userInput = userInputElem.value.trim();
+      const filePreview = document.getElementById('filePreview');
+      let finalMessage = userInput;
 
+      // If there are attachments, list them
+      if (selectedFiles.length > 0) {
+        const fileNames = selectedFiles.map(file => file.name).join(', ');
+        finalMessage += `\n\n[Attachments: ${fileNames}]`;
+      }
+
+      if (!finalMessage) return;
+
+      // Add user message to chat
+      addMessage(finalMessage, true);
+      conversationHistory.push({ role: 'user', content: finalMessage });
+
+      // Reset input
+      userInputElem.value = '';
+      filePreview.innerText = '';
+      selectedFiles = []; // clear attached files
+
+      isSending = true;
+
+      // Example: If you want "Search" or "Reason" to set different system messages, you could:
+      // if (mode === 'search') { ... } else if (mode === 'reason') { ... }
+
+      // Prepare messages
       const messages = conversationHistory.map(msg => ({
         role: msg.role,
         content: msg.content
@@ -322,7 +464,7 @@
           reader.cancel();
           alert('Response taking too long. Please try a different model or check your API key.');
           isSending = false;
-        }, 15000); // 15-second timeout
+        }, 15000);
 
         while (true) {
           const { done, value } = await reader.read();
@@ -378,27 +520,6 @@
         isSending = false;
       }
     }
-
-    // Handle file attachment uploads
-    function handleFileUpload(event) {
-      const files = event.target.files;
-      if (files.length) {
-        for (const file of files) {
-          // Here you could process the file further (e.g., send it to your AI analysis endpoint)
-          addMessage(`File attached: ${file.name}`, true);
-        }
-        event.target.value = "";
-      }
-    }
-
-    document.getElementById('messageInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
-
-    const sendButton = document.getElementById('sendButton');
-    sendButton.addEventListener('click', sendMessage);
-
-    document.getElementById('fileInput').addEventListener('change', handleFileUpload);
   </script>
 </body>
 </html>
