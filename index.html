@@ -8,27 +8,71 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
   <style>
-    /* Optional: Customize scrollbar for chat area */
+    /* Cyberpunk Theme Styles */
+    body {
+      background: #0a0a0a;
+      color: #0ff;
+      font-family: 'Roboto', sans-serif;
+    }
+    /* Scrollbar customization */
     ::-webkit-scrollbar {
       width: 8px;
     }
     ::-webkit-scrollbar-thumb {
-      background-color: rgba(100, 100, 100, 0.5);
+      background-color: rgba(0, 255, 255, 0.5);
       border-radius: 4px;
     }
-    .code-block {
-      position: relative;
-      margin-top: 10px;
+    /* Button animations */
+    .cyber-button {
+      transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
     }
+    .cyber-button:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 10px #0ff;
+    }
+    /* Input styling */
+    .cyber-input {
+      background-color: #1a1a1a;
+      border: 1px solid #0ff;
+      color: #0ff;
+    }
+    /* Chat bubbles */
+    .user-message {
+      background-color: #0ff;
+      color: #0a0a0a;
+      box-shadow: 0 0 10px #0ff;
+    }
+    .assistant-message {
+      background-color: #1a1a1a;
+      color: #0ff;
+      border: 1px solid #0ff;
+      box-shadow: 0 0 10px #0ff;
+    }
+    /* Fade-in animation for chat messages */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Header style with neon gradient */
+    header {
+      background: linear-gradient(45deg, #0ff, #ff0);
+      color: #0a0a0a;
+      box-shadow: 0 0 15px #0ff;
+    }
+    /* Code block customization */
     pre {
-      background-color: #f5f5f5;
-      border: 1px solid #ddd;
+      background-color: #111;
+      border: 1px solid #0ff;
       border-radius: 5px;
       padding: 10px;
       margin: 0;
       overflow-x: auto;
     }
     code {
+      color: #0ff;
       font-family: 'Courier New', Courier, monospace;
       white-space: pre-wrap;
     }
@@ -37,8 +81,8 @@
       top: 5px;
       right: 5px;
       padding: 5px 10px;
-      background: #007bff;
-      color: white;
+      background: #ff0;
+      color: #0a0a0a;
       border: none;
       border-radius: 5px;
       cursor: pointer;
@@ -48,19 +92,19 @@
     }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800 transition-colors duration-300">
+<body class="transition-colors duration-300">
   <!-- Main Container -->
-  <div class="min-h-screen flex flex-col items-center">
+  <div class="min-h-screen flex flex-col items-center py-6">
     <!-- Setup Section -->
-    <div id="setupSection" class="p-4 flex flex-col space-y-4 w-full max-w-md">
+    <div id="setupSection" class="p-6 flex flex-col space-y-4 w-full max-w-md bg-gray-900 rounded-lg shadow-lg">
       <div class="flex flex-col space-y-2">
         <label for="apiKey" class="font-semibold">Open Router API Key:</label>
-        <input type="text" id="apiKey" placeholder="Enter your Open Router API key" class="p-2 border border-gray-300 rounded-md">
-        <button onclick="saveApiKey()" class="p-2 bg-violet-500 text-white rounded-md">Save API Key</button>
+        <input type="text" id="apiKey" placeholder="Enter your Open Router API key" class="p-2 cyber-input rounded-md">
+        <button onclick="saveApiKey()" class="p-2 bg-teal-500 text-black rounded-md cyber-button">Save API Key</button>
       </div>
       <div class="flex flex-col space-y-2">
         <label for="modelSelect" class="font-semibold">Select Model:</label>
-        <select id="modelSelect" onchange="handleModelChange()" class="p-2 border border-gray-300 rounded-md">
+        <select id="modelSelect" onchange="handleModelChange()" class="p-2 cyber-input rounded-md">
           <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo (openai/gpt-3.5-turbo)</option>
           <option value="openai/gpt-4">GPT-4 (openai/gpt-4)</option>
           <option value="anthropic/claude-2">Claude 2 (anthropic/claude-2)</option>
@@ -79,17 +123,17 @@
           <option value="qwen/qwen-2.5-72b-instruct">Qwen2.5 72B Instruct (qwen/qwen-2.5-72b-instruct)</option>
           <option value="other">Other (Enter custom model ID)</option>
         </select>
-        <input type="text" id="customModel" placeholder="Enter custom model ID" class="p-2 border border-gray-300 rounded-md hidden">
+        <input type="text" id="customModel" placeholder="Enter custom model ID" class="p-2 cyber-input rounded-md hidden">
       </div>
-      <button id="startChatButton" onclick="startChat()" class="p-2 bg-green-500 text-white rounded-md" disabled>Start Chat</button>
+      <button id="startChatButton" onclick="startChat()" class="p-2 bg-green-500 text-black rounded-md cyber-button" disabled>Start Chat</button>
     </div>
 
     <!-- Chat Section -->
-    <div id="chatSection" class="hidden w-full max-w-3xl flex flex-col">
+    <div id="chatSection" class="hidden w-full max-w-3xl flex flex-col mt-6 bg-gray-900 rounded-lg shadow-lg overflow-hidden">
       <!-- Header -->
-      <header class="bg-white shadow-md p-4 flex items-center justify-between">
+      <header class="p-4 flex items-center justify-between">
         <div class="flex items-center space-x-2">
-          <img src="A54C51E0-1217-4CF6-956B-4C75CB05E8F8.webp" alt="Logo" class="rounded-full shadow-lg p-1" />
+          <img src="A54C51E0-1217-4CF6-956B-4C75CB05E8F8.webp" alt="Logo" class="rounded-full shadow-lg p-1 w-10 h-10" />
           <h1 class="text-2xl font-bold">Hycross AI Chat</h1>
         </div>
       </header>
@@ -97,9 +141,9 @@
       <!-- Chat Area -->
       <main id="chatArea" class="flex-grow p-4 overflow-y-auto space-y-4">
         <!-- Sample incoming message -->
-        <div class="flex items-start space-x-3">
+        <div class="flex items-start space-x-3 fade-in">
           <div class="w-10 h-10 bg-blue-500 rounded-full flex-shrink-0"></div>
-          <div class="bg-white p-3 rounded-lg shadow max-w-md">
+          <div class="assistant-message p-3 rounded-lg shadow max-w-md">
             <p>Hello! How can I assist you today?</p>
           </div>
         </div>
@@ -107,27 +151,25 @@
 
       <!-- Chat Input Area -->
       <footer class="p-4">
-        <div class="mx-auto max-w-3xl">
-          <div class="flex items-center space-x-2">
-            <input
-              id="messageInput"
-              type="text"
-              placeholder="Type your message here..."
-              class="flex-grow bg-white border border-gray-300 rounded-full pl-6 py-4 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
-            />
-            <button
-              id="sendButton"
-              class="w-14 h-14 rounded-full bg-violet-500 group shadow-xl flex items-center justify-center relative overflow-hidden"
-            >
-              <svg class="relative z-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" width="28" height="28">
-                <path fill-opacity="0.01" fill="white" d="M63.6689 29.0491L34.6198 63.6685L0.00043872 34.6194L29.0496 0L63.6689 29.0491Z"></path>
-                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="3.77" stroke="white" d="M42.85 18.71L21.06 44.67"></path>
-                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="3.77" stroke="white" d="M26.93 20.1L42.85 18.71L44.24 34.62"></path>
-              </svg>
-              <div class="w-full h-full rotate-45 absolute left-[32%] top-[32%] bg-black group-hover:-left-[100%] group-hover:-top-[100%] transition-all duration-500"></div>
-              <div class="w-full h-full -rotate-45 absolute -left-[32%] -top-[32%] bg-black group-hover:left-[100%] group-hover:top-[100%] transition-all duration-500"></div>
-            </button>
-          </div>
+        <div class="flex items-center space-x-2">
+          <input
+            id="messageInput"
+            type="text"
+            placeholder="Type your message here..."
+            class="flex-grow p-4 cyber-input rounded-full text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
+          />
+          <button
+            id="sendButton"
+            class="w-14 h-14 rounded-full bg-teal-500 cyber-button shadow-xl flex items-center justify-center relative overflow-hidden"
+          >
+            <svg class="relative z-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" width="28" height="28">
+              <path fill-opacity="0.01" fill="white" d="M63.6689 29.0491L34.6198 63.6685L0.00043872 34.6194L29.0496 0L63.6689 29.0491Z"></path>
+              <path stroke-linejoin="round" stroke-linecap="round" stroke-width="3.77" stroke="white" d="M42.85 18.71L21.06 44.67"></path>
+              <path stroke-linejoin="round" stroke-linecap="round" stroke-width="3.77" stroke="white" d="M26.93 20.1L42.85 18.71L44.24 34.62"></path>
+            </svg>
+            <div class="w-full h-full rotate-45 absolute left-[32%] top-[32%] bg-black group-hover:-left-[100%] group-hover:-top-[100%] transition-all duration-500"></div>
+            <div class="w-full h-full -rotate-45 absolute -left-[32%] -top-[32%] bg-black group-hover:left-[100%] group-hover:top-[100%] transition-all duration-500"></div>
+          </button>
         </div>
       </footer>
     </div>
@@ -184,18 +226,18 @@
     function addMessage(content, isUser) {
       const chatArea = document.getElementById('chatArea');
       const messageBubble = document.createElement('div');
-      messageBubble.className = isUser ? 'flex justify-end' : 'flex items-start space-x-3';
+      messageBubble.className = isUser ? 'flex justify-end fade-in' : 'flex items-start space-x-3 fade-in';
 
       if (isUser) {
         messageBubble.innerHTML = `
-          <div class="bg-violet-500 text-white p-3 rounded-lg shadow max-w-md break-words">
+          <div class="user-message p-3 rounded-lg shadow max-w-md break-words">
             ${content}
           </div>
         `;
       } else {
         messageBubble.innerHTML = `
           <div class="w-10 h-10 bg-blue-500 rounded-full flex-shrink-0"></div>
-          <div class="bg-white p-3 rounded-lg shadow max-w-md">
+          <div class="assistant-message p-3 rounded-lg shadow max-w-md">
             <p>${formatCodeBlocks(content)}</p>
           </div>
         `;
@@ -286,10 +328,10 @@
                   assistantMessage += content;
                   if (!messageDiv) {
                     messageDiv = document.createElement('div');
-                    messageDiv.className = 'flex items-start space-x-3';
+                    messageDiv.className = 'flex items-start space-x-3 fade-in';
                     messageDiv.innerHTML = `
                       <div class="w-10 h-10 bg-blue-500 rounded-full flex-shrink-0"></div>
-                      <div class="bg-white p-3 rounded-lg shadow max-w-md">
+                      <div class="assistant-message p-3 rounded-lg shadow max-w-md">
                         <p>${formatCodeBlocks(assistantMessage)}</p>
                       </div>
                     `;
