@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hycross AI - Cyberpunk Edition</title>
+  <title>Hycross AI - Cyberpunk Chat</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link
@@ -11,115 +11,41 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
   />
   <style>
-    /* Cyberpunk theme */
+    /* ---- CYBERPUNK THEME ---- */
     body {
-      background-color: #0a0a0a;
+      background-color: #000;
       color: #0ff;
-      font-family: 'Roboto', sans-serif;
+      font-family: "Roboto", sans-serif;
     }
-
-    /* Scrollbar customization */
     ::-webkit-scrollbar {
       width: 8px;
     }
     ::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 255, 255, 0.5);
+      background-color: rgba(0, 255, 255, 0.4);
       border-radius: 4px;
     }
 
-    /* Neon glow on hover/click */
+    /* Neon edges on hover/click */
     .cyber-button {
       transition: transform 0.1s, box-shadow 0.1s;
     }
     .cyber-button:hover {
-      box-shadow: 0 0 8px #0ff;
+      box-shadow: 0 0 6px #0ff;
     }
     .cyber-button:active {
       transform: scale(0.95);
-      box-shadow: 0 0 12px #0ff;
-    }
-
-    /* Category buttons */
-    .category-btn {
-      background-color: #111;
-      border: 2px solid #0ff;
-      color: #0ff;
-      transition: background-color 0.3s;
-    }
-    .category-btn:hover {
-      background-color: #0ff;
-      color: #0a0a0a;
       box-shadow: 0 0 10px #0ff;
     }
 
-    /* Chat bubbles */
-    .user-message {
-      background-color: #0ff;
-      color: #0a0a0a;
-      box-shadow: 0 0 8px #0ff;
-    }
-    .assistant-message {
-      background-color: #1a1a1a;
-      color: #0ff;
-      border: 1px solid #0ff;
-      box-shadow: 0 0 8px #0ff;
-    }
-
-    /* Fade-in animation */
-    .fade-in {
-      animation: fadeIn 0.4s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Code blocks */
-    pre {
+    /* Top Bar */
+    .top-bar {
       background-color: #111;
-      border: 1px solid #0ff;
-      border-radius: 5px;
-      padding: 10px;
-      margin: 0;
-      overflow-x: auto;
+      box-shadow: 0 0 10px #0ff;
     }
-    code {
+    select, option {
+      background-color: #000;
       color: #0ff;
-      font-family: 'Courier New', Courier, monospace;
-      white-space: pre-wrap;
-    }
-    .copy-button {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      padding: 5px 10px;
-      background: #ff0;
-      color: #0a0a0a;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    /* Chat input pinned at bottom on mobile */
-    @media (max-width: 640px) {
-      #chatControls {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 50;
-        background-color: #0a0a0a;
-        padding-bottom: 0.75rem;
-      }
-      #chatArea {
-        padding-bottom: 6rem; /* so messages aren't hidden behind the controls */
-      }
+      border: 1px solid #0ff;
     }
 
     /* Modal for API Key */
@@ -142,18 +68,142 @@
       width: 90%;
       max-width: 400px;
     }
+
+    /* Logo in top bar */
+    .logo-img {
+      width: 32px;
+      height: 32px;
+      object-fit: cover;
+      border: 1px solid #0ff;
+      border-radius: 4px;
+    }
+
+    /* Chat bubbles */
+    .user-message {
+      background-color: #0ff;
+      color: #000;
+      box-shadow: 0 0 5px #0ff;
+    }
+    .assistant-message {
+      background-color: #111;
+      color: #0ff;
+      border: 1px solid #0ff;
+      box-shadow: 0 0 5px #0ff;
+    }
+
+    /* Fade-in animation */
+    .fade-in {
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0);   }
+    }
+
+    /* Code blocks */
+    pre {
+      background-color: #000;
+      border: 1px solid #0ff;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 0;
+      overflow-x: auto;
+    }
+    code {
+      color: #0ff;
+      font-family: 'Courier New', Courier, monospace;
+      white-space: pre-wrap;
+    }
+    .copy-button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      padding: 5px 10px;
+      background: #ff0;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* Chat area sizing */
+    #chatArea {
+      height: calc(100vh - 140px); /* top bar + bottom bar space */
+      overflow-y: auto;
+    }
+    @media (max-width: 640px) {
+      #chatArea {
+        height: calc(100vh - 110px); 
+      }
+    }
+
+    /* Bottom Chat Bar */
+    .chat-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background-color: #111;
+      box-shadow: 0 0 10px #0ff;
+      z-index: 50;
+      padding: 0.5rem 1rem;
+    }
+
+    /* Multiline text area styling */
+    .chat-textarea {
+      background-color: #000;
+      color: #0ff;
+      border: 1px solid #0ff;
+      width: 100%;
+      resize: none;
+      padding: 0.75rem 0.75rem;
+      line-height: 1.4;
+      border-radius: 9999px;
+      min-height: 42px;
+      max-height: 120px; /* limit how tall it can get */
+      overflow-y: auto;
+    }
+    .chat-textarea:focus {
+      outline: none;
+      box-shadow: 0 0 5px #0ff;
+    }
+
+    /* Attachment Preview */
+    .attachment-preview {
+      display: flex;
+      align-items: center;
+      margin-right: 8px;
+      position: relative;
+    }
+    .attachment-img {
+      width: 40px; height: 40px;
+      border-radius: 6px;
+      object-fit: cover;
+      margin-right: 4px;
+      border: 1px solid #0ff;
+    }
+    .attachment-close {
+      position: absolute;
+      top: -6px; right: -6px;
+      background: #f00;
+      color: #fff;
+      border-radius: 50%;
+      width: 18px; height: 18px;
+      text-align: center;
+      line-height: 18px;
+      font-size: 12px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <!-- Modal for API Key (hidden by default) -->
+  <!-- API Key Modal -->
   <div id="apiKeyModal" class="hidden modal-bg">
     <div class="modal-content">
-      <h2 class="text-xl font-bold mb-4 text-center">Enter Your API Key</h2>
+      <h2 class="text-xl font-bold mb-4 text-center">Open Router API Key</h2>
       <input
         type="text"
         id="apiKey"
-        placeholder="OpenRouter API Key"
-        class="w-full p-2 mb-4 cyber-input rounded-md"
+        placeholder="Paste your API Key here"
+        class="w-full p-2 mb-4 rounded-md bg-black text-teal-300 border border-teal-400"
       />
       <div class="flex justify-center">
         <button
@@ -172,73 +222,97 @@
     </div>
   </div>
 
-  <!-- Gear icon to open API Key modal -->
-  <div class="absolute top-4 right-4">
-    <button
-      class="cyber-button p-2 bg-gray-800 rounded-full"
-      onclick="toggleApiKeyModal()"
-    >
+  <!-- Top Bar -->
+  <div class="top-bar w-full flex items-center justify-between p-2">
+    <!-- Left side: Logo + Hycross AI text -->
+    <div class="flex items-center space-x-2 ml-2">
+      <img
+        src="https://via.placeholder.com/32x32.png?text=Logo"
+        alt="Hycross AI Logo"
+        class="logo-img"
+      />
+      <h1 class="text-xl font-bold">Hycross AI</h1>
+    </div>
+
+    <!-- Right side: Model Select + Gear Icon -->
+    <div class="flex items-center space-x-2 mr-2">
+      <label class="text-sm font-bold hidden sm:block">Model:</label>
+      <select id="modelSelect" onchange="handleModelChange()" class="p-1 text-sm rounded-md">
+        <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo (openai/gpt-3.5-turbo)</option>
+        <option value="openai/gpt-4">GPT-4 (openai/gpt-4)</option>
+        <option value="anthropic/claude-2">Claude 2 (anthropic/claude-2)</option>
+        <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet (anthropic/claude-3.5-sonnet)</option>
+        <option value="anthropic/claude-3-haiku">Claude 3 Haiku (anthropic/claude-3-haiku)</option>
+        <option value="meta-llama/llama-2-70b-chat">Llama 2 70B Chat (meta-llama/llama-2-70b-chat)</option>
+        <option value="meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B Instruct (meta-llama/llama-3.3-70b-instruct)</option>
+        <option value="deepseek/deepseek-r1">DeepSeek R1 (deepseek/deepseek-r1)</option>
+        <option value="deepseek/deepseek-r1:free">DeepSeek R1 (free) (deepseek/deepseek-r1:free)</option>
+        <option value="mistral/mistral-7b-instruct">Mistral 7B Instruct (mistral/mistral-7b-instruct)</option>
+        <option value="mistral/mistral-7b-instruct:free">Mistral 7B Instruct (free) (mistral/mistral-7b-instruct:free)</option>
+        <option value="mistral/mistral-large">Mistral Large (mistral/mistral-large)</option>
+        <option value="google/gemma-2-9b-it">Gemma 2 9B (google/gemma-2-9b-it)</option>
+        <option value="google/gemma-2-9b-it:free">Gemma 2 9B (free) (google/gemma-2-9b-it:free)</option>
+        <option value="google/gemma-2-27b-it">Gemma 2 27B (google/gemma-2-27b-it)</option>
+        <option value="qwen/qwen-2.5-72b-instruct">Qwen2.5 72B Instruct (qwen/qwen-2.5-72b-instruct)</option>
+        <option value="other">Other (custom)</option>
+      </select>
+      <input
+        type="text"
+        id="customModel"
+        placeholder="Enter custom model ID"
+        class="hidden p-1 text-sm rounded-md bg-black text-teal-300 border border-teal-400"
+      />
       <!-- Gear Icon -->
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="2"
-        stroke="#0ff"
-        class="w-6 h-6"
+      <button
+        class="cyber-button p-2 bg-gray-800 rounded-full"
+        onclick="toggleApiKeyModal()"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M4.75 15.25l1.664.277a6.522 6.522 0 001.435 2.482l-1.032 1.399A1.75 1.75 0 006.944 22h2.367a1.75 1.75 0 001.39-.672l1.032-1.399a6.52 6.52 0 002.548 0l1.032 1.399c.318.433.82.672 1.39.672h2.367a1.75 1.75 0 001.219-2.822l-1.032-1.399a6.52 6.52 0 001.435-2.482l1.664-.277a1.75 1.75 0 001.502-1.741V9.491a1.75 1.75 0 00-1.502-1.741l-1.664-.277a6.522 6.522 0 00-1.435-2.482l1.032-1.399A1.75 1.75 0 0017.056 2h-2.367a1.75 1.75 0 00-1.39.672l-1.032 1.399a6.52 6.52 0 00-2.548 0L9.687 2.672A1.75 1.75 0 008.296 2H5.93a1.75 1.75 0 00-1.219 2.822l1.032 1.399a6.52 6.52 0 00-1.435 2.482l-1.664.277A1.75 1.75 0 001.75 9.491v3.018c0 .87.626 1.61 1.502 1.741z"
-        />
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-      </svg>
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="#0ff"
+          class="w-5 h-5"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4.75 15.25l1.664.277a6.522 6.522 0 001.435 2.482l-1.032 1.399A1.75 1.75 0 006.944 22h2.367a1.75 1.75 0 001.39-.672l1.032-1.399a6.52 6.52 0 002.548 0l1.032 1.399c.318.433.82.672 1.39.672h2.367a1.75 1.75 0 001.219-2.822l-1.032-1.399a6.52 6.52 0 001.435-2.482l1.664-.277a1.75 1.75 0 001.502-1.741V9.491a1.75 1.75 0 00-1.502-1.741l-1.664-.277a6.522 6.522 0 00-1.435-2.482l1.032-1.399A1.75 1.75 0 0017.056 2h-2.367a1.75 1.75 0 00-1.39.672l-1.032 1.399a6.52 6.52 0 00-2.548 0l-1.032-1.399A1.75 1.75 0 008.296 2H5.93a1.75 1.75 0 00-1.219 2.822l1.032 1.399a6.52 6.52 0 00-1.435 2.482l-1.664.277A1.75 1.75 0 001.75 9.491v3.018c0 .87.626 1.61 1.502 1.741z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+        </svg>
+      </button>
+    </div>
   </div>
 
-  <!-- Hero / Landing Section -->
-  <section class="flex flex-col items-center justify-center text-center mt-16">
-    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-8">What can I help with?</h1>
-    <div class="flex flex-wrap gap-4 justify-center mb-12 px-4">
-      <button class="category-btn px-4 py-2 rounded-lg cyber-button">Create Image</button>
-      <button class="category-btn px-4 py-2 rounded-lg cyber-button">Code</button>
-      <button class="category-btn px-4 py-2 rounded-lg cyber-button">Get Advice</button>
-      <button class="category-btn px-4 py-2 rounded-lg cyber-button">Brainstorm</button>
-      <button class="category-btn px-4 py-2 rounded-lg cyber-button">More</button>
-    </div>
-  </section>
-
-  <!-- Chat Section -->
-  <section id="chatSection" class="w-full max-w-3xl mx-auto bg-gray-900 rounded-lg shadow-lg overflow-hidden hidden">
-    <!-- Chat Area -->
-    <div id="chatArea" class="p-4 overflow-y-auto space-y-4 h-[60vh] sm:h-[70vh]">
-      <!-- Example assistant message -->
-      <div class="flex items-start space-x-3 fade-in">
-        <div class="w-10 h-10 bg-blue-500 rounded-full flex-shrink-0"></div>
-        <div class="assistant-message p-3 rounded-lg shadow max-w-md">
-          <p>Hello! How can I assist you today?</p>
-        </div>
+  <!-- Chat Area -->
+  <div id="chatArea" class="p-4">
+    <!-- Example initial assistant message -->
+    <div class="flex items-start space-x-3 fade-in">
+      <div class="w-10 h-10 bg-blue-500 rounded-full flex-shrink-0"></div>
+      <div class="assistant-message p-3 rounded-lg shadow max-w-md">
+        <p>Hello! How can I help you today?</p>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Bottom Chat Controls -->
-  <div id="chatControls" class="w-full max-w-3xl mx-auto mt-4">
-    <div class="flex items-center space-x-2 px-4">
-      <!-- Attachment Button -->
+  <!-- Bottom Chat Bar -->
+  <div class="chat-bar">
+    <div class="flex items-center space-x-3">
+      <!-- Plus icon (for file upload) -->
       <button
-        id="attachButton"
-        class="p-2 rounded-full bg-teal-500 cyber-button"
+        class="cyber-button p-2 bg-gray-800 rounded-full"
         onclick="document.getElementById('fileInput').click()"
       >
-        +
+        <span class="text-xl text-teal-400">+</span>
       </button>
-      <!-- Hidden File Input -->
+
+      <!-- Hidden file input -->
       <input
         type="file"
         id="fileInput"
@@ -247,36 +321,53 @@
         onchange="onFileSelected(event)"
       />
 
-      <!-- Input Field -->
-      <div
-        id="messageInputContainer"
-        class="relative flex-grow"
-      >
-        <input
+      <!-- Attachment preview area -->
+      <div id="attachmentPreview" class="flex items-center"></div>
+
+      <!-- Multiline text area -->
+      <div class="flex-grow relative">
+        <textarea
           id="messageInput"
-          type="text"
-          placeholder="Ask anything..."
-          class="w-full p-4 pr-28 cyber-input rounded-full text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
-        />
-        <!-- Attached File Preview (appears here if user selects files) -->
-        <div
-          id="filePreview"
-          class="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm text-gray-300"
-        ></div>
+          rows="1"
+          placeholder="Type your message..."
+          class="chat-textarea"
+          oninput="autoGrow(this)"
+        ></textarea>
       </div>
 
-      <!-- "Search" and "Reason" act like different 'Send' buttons -->
+      <!-- Send (arrow) icon -->
       <button
-        class="px-4 py-2 bg-teal-500 cyber-button text-black font-bold rounded-lg"
-        onclick="sendMessage('search')"
+        class="cyber-button p-2 bg-gray-800 rounded-full"
+        onclick="sendMessage()"
       >
-        Search
-      </button>
-      <button
-        class="px-4 py-2 bg-purple-500 cyber-button text-black font-bold rounded-lg"
-        onclick="sendMessage('reason')"
-      >
-        Reason
+        <!-- Arrow icon -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 64 64"
+          width="28"
+          height="28"
+        >
+          <path
+            fill-opacity="0.01"
+            fill="white"
+            d="M63.6689 29.0491L34.6198 63.6685L0.00043872 34.6194L29.0496 0L63.6689 29.0491Z"
+          ></path>
+          <path
+            stroke-linejoin="round"
+            stroke-linecap="round"
+            stroke-width="3.77"
+            stroke="white"
+            d="M42.85 18.71L21.06 44.67"
+          ></path>
+          <path
+            stroke-linejoin="round"
+            stroke-linecap="round"
+            stroke-width="3.77"
+            stroke="white"
+            d="M26.93 20.1L42.85 18.71L44.24 34.62"
+          ></path>
+        </svg>
       </button>
     </div>
   </div>
@@ -288,10 +379,10 @@
     let selectedModel = 'openai/gpt-3.5-turbo';
     let isSending = false;
 
-    // For attachments
-    let selectedFiles = [];
+    // For attachments (store them in an array until user sends)
+    let attachedFiles = [];
 
-    /* Toggle API Key modal */
+    /* Toggle API Key Modal */
     function toggleApiKeyModal() {
       const modal = document.getElementById('apiKeyModal');
       modal.classList.toggle('hidden');
@@ -309,7 +400,7 @@
       toggleApiKeyModal();
     }
 
-    /* Show/hide custom model input */
+    /* Handle Model Dropdown */
     function handleModelChange() {
       const modelSelect = document.getElementById('modelSelect').value;
       const customModelInput = document.getElementById('customModel');
@@ -325,18 +416,62 @@
       });
     }
 
-    /* When a file is selected, store it and show a quick preview in the input area */
-    function onFileSelected(event) {
-      selectedFiles = [...event.target.files]; // array of files
-      if (selectedFiles.length > 0) {
-        const fileNames = selectedFiles.map(file => file.name).join(', ');
-        document.getElementById('filePreview').innerText = `Attached: ${fileNames}`;
-      } else {
-        document.getElementById('filePreview').innerText = '';
-      }
+    /* Auto-grow the textarea as user types */
+    function autoGrow(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
     }
 
-    /* Format code blocks for messages */
+    /* Handle File Selection */
+    function onFileSelected(event) {
+      const files = [...event.target.files];
+      // Reset the file input so user can select same file again if needed
+      event.target.value = '';
+
+      // Add them to attachedFiles
+      files.forEach(file => {
+        attachedFiles.push(file);
+      });
+      updateAttachmentPreview();
+    }
+
+    /* Update the small preview in the chat bar */
+    function updateAttachmentPreview() {
+      const previewContainer = document.getElementById('attachmentPreview');
+      previewContainer.innerHTML = '';
+
+      attachedFiles.forEach((file, index) => {
+        const previewDiv = document.createElement('div');
+        previewDiv.className = 'attachment-preview';
+
+        // If image, show thumbnail; else show a generic icon
+        if (file.type.startsWith('image/')) {
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          img.className = 'attachment-img';
+          previewDiv.appendChild(img);
+        } else {
+          const icon = document.createElement('div');
+          icon.className = 'attachment-img flex items-center justify-center bg-gray-700 text-white text-xs';
+          icon.textContent = file.name.split('.').pop().toUpperCase() || 'FILE';
+          previewDiv.appendChild(icon);
+        }
+
+        // Add the close (X) button
+        const closeBtn = document.createElement('div');
+        closeBtn.className = 'attachment-close';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.onclick = () => {
+          attachedFiles.splice(index, 1);
+          updateAttachmentPreview();
+        };
+        previewDiv.appendChild(closeBtn);
+
+        previewContainer.appendChild(previewDiv);
+      });
+    }
+
+    /* Format code blocks in messages */
     function formatCodeBlocks(text) {
       return text.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
         return `
@@ -356,31 +491,22 @@
       });
     }
 
-    /* Reveal the chat section if hidden */
-    function showChatSection() {
-      const chatSection = document.getElementById('chatSection');
-      if (chatSection.classList.contains('hidden')) {
-        chatSection.classList.remove('hidden');
-      }
-    }
-
-    /* Add a message to the chat area */
+    /* Add message to the chat area */
     function addMessage(content, isUser) {
-      showChatSection(); // Make sure chat is visible
       const chatArea = document.getElementById('chatArea');
-      const messageBubble = document.createElement('div');
-      messageBubble.className = isUser
-        ? 'flex justify-end fade-in'
-        : 'flex items-start space-x-3 fade-in';
+      const messageDiv = document.createElement('div');
+      messageDiv.className = isUser
+        ? 'flex justify-end fade-in mt-2'
+        : 'flex items-start space-x-3 fade-in mt-2';
 
       if (isUser) {
-        messageBubble.innerHTML = `
+        messageDiv.innerHTML = `
           <div class="user-message p-3 rounded-lg shadow max-w-md break-words">
             ${content}
           </div>
         `;
       } else {
-        messageBubble.innerHTML = `
+        messageDiv.innerHTML = `
           <div class="w-10 h-10 bg-blue-500 rounded-full flex-shrink-0"></div>
           <div class="assistant-message p-3 rounded-lg shadow max-w-md">
             <p>${formatCodeBlocks(content)}</p>
@@ -388,48 +514,41 @@
         `;
       }
 
-      chatArea.appendChild(messageBubble);
-      Prism.highlightAllUnder(messageBubble);
+      chatArea.appendChild(messageDiv);
+      Prism.highlightAllUnder(messageDiv);
       chatArea.scrollTop = chatArea.scrollHeight;
     }
 
-    /* Send message (Search or Reason) */
-    async function sendMessage(mode) {
+    /* Send Message */
+    async function sendMessage() {
       if (isSending) return;
       if (!apiKey) {
-        alert('Please set your API key first (gear icon).');
+        alert('Please set your API key first (gear icon at the top).');
         return;
       }
 
-      // Gather user input
       const userInputElem = document.getElementById('messageInput');
-      const userInput = userInputElem.value.trim();
-      const filePreview = document.getElementById('filePreview');
-      let finalMessage = userInput;
+      let userInput = userInputElem.value.trim();
+      if (!userInput && attachedFiles.length === 0) return;
 
-      // If there are attachments, list them
-      if (selectedFiles.length > 0) {
-        const fileNames = selectedFiles.map(file => file.name).join(', ');
-        finalMessage += `\n\n[Attachments: ${fileNames}]`;
+      // If there are attachments, mention them in the message
+      if (attachedFiles.length > 0) {
+        const fileNames = attachedFiles.map(f => f.name).join(', ');
+        userInput += userInput ? `\n\n[Attachments: ${fileNames}]` : `[Attachments: ${fileNames}]`;
       }
 
-      if (!finalMessage) return;
-
       // Add user message to chat
-      addMessage(finalMessage, true);
-      conversationHistory.push({ role: 'user', content: finalMessage });
+      addMessage(userInput, true);
+      conversationHistory.push({ role: 'user', content: userInput });
 
-      // Reset input
+      // Reset input & attachments
       userInputElem.value = '';
-      filePreview.innerText = '';
-      selectedFiles = []; // clear attached files
+      userInputElem.style.height = 'auto'; // reset height
+      attachedFiles = [];
+      updateAttachmentPreview();
 
       isSending = true;
 
-      // Example: If you want "Search" or "Reason" to set different system messages, you could:
-      // if (mode === 'search') { ... } else if (mode === 'reason') { ... }
-
-      // Prepare messages
       const messages = conversationHistory.map(msg => ({
         role: msg.role,
         content: msg.content
@@ -458,11 +577,11 @@
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let assistantMessage = '';
-        let messageDiv = null;
+        let messageBubble = null;
 
         const timeoutId = setTimeout(() => {
           reader.cancel();
-          alert('Response taking too long. Please try a different model or check your API key.');
+          alert('Response taking too long. Try a different model or check your API key.');
           isSending = false;
         }, 15000);
 
@@ -487,25 +606,25 @@
                 const content = parsed.choices[0]?.delta?.content;
                 if (content) {
                   assistantMessage += content;
-                  if (!messageDiv) {
-                    messageDiv = document.createElement('div');
-                    messageDiv.className = 'flex items-start space-x-3 fade-in';
-                    messageDiv.innerHTML = `
+                  if (!messageBubble) {
+                    messageBubble = document.createElement('div');
+                    messageBubble.className = 'flex items-start space-x-3 fade-in mt-2';
+                    messageBubble.innerHTML = `
                       <div class="w-10 h-10 bg-blue-500 rounded-full flex-shrink-0"></div>
                       <div class="assistant-message p-3 rounded-lg shadow max-w-md">
                         <p>${formatCodeBlocks(assistantMessage)}</p>
                       </div>
                     `;
-                    document.getElementById('chatArea').appendChild(messageDiv);
-                    Prism.highlightAllUnder(messageDiv);
+                    document.getElementById('chatArea').appendChild(messageBubble);
+                    Prism.highlightAllUnder(messageBubble);
                   } else {
-                    messageDiv.querySelector('p').innerHTML = formatCodeBlocks(assistantMessage);
-                    Prism.highlightAllUnder(messageDiv);
+                    messageBubble.querySelector('p').innerHTML = formatCodeBlocks(assistantMessage);
+                    Prism.highlightAllUnder(messageBubble);
                   }
                   document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
                 }
-              } catch (e) {
-                console.error('Error parsing stream data:', e);
+              } catch (err) {
+                console.error('Error parsing data chunk:', err);
               }
             }
           }
