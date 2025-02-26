@@ -90,6 +90,21 @@
     .hidden {
       display: none;
     }
+    /* Mobile-specific styles */
+    @media (max-width: 640px) {
+      #chatSection footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        background-color: #0a0a0a;
+        padding: 0.75rem 1rem;
+      }
+      #chatSection main {
+        padding-bottom: 80px; /* Ensure messages aren't hidden behind the fixed footer */
+      }
+    }
   </style>
 </head>
 <body class="transition-colors duration-300">
@@ -152,6 +167,10 @@
       <!-- Chat Input Area -->
       <footer class="p-4">
         <div class="flex items-center space-x-2">
+          <!-- Attachment Button -->
+          <button id="attachButton" class="p-2 rounded-full bg-teal-500 cyber-button" onclick="document.getElementById('fileInput').click()">+</button>
+          <!-- File Input (hidden) -->
+          <input type="file" id="fileInput" class="hidden" multiple />
           <input
             id="messageInput"
             type="text"
@@ -360,12 +379,26 @@
       }
     }
 
+    // Handle file attachment uploads
+    function handleFileUpload(event) {
+      const files = event.target.files;
+      if (files.length) {
+        for (const file of files) {
+          // Here you could process the file further (e.g., send it to your AI analysis endpoint)
+          addMessage(`File attached: ${file.name}`, true);
+        }
+        event.target.value = "";
+      }
+    }
+
     document.getElementById('messageInput').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') sendMessage();
     });
 
     const sendButton = document.getElementById('sendButton');
     sendButton.addEventListener('click', sendMessage);
+
+    document.getElementById('fileInput').addEventListener('change', handleFileUpload);
   </script>
 </body>
 </html>
