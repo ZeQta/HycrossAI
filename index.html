@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hycross AI - OpenRouer Chatbot</title>
+  <title>Hycross AI - OpenRouter Chatbot</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link
@@ -492,14 +492,14 @@
     }
 
     /* Add message to the chat area */
-    function addMessage(content, isUser) {
+    function addMessage(content, isUser ) {
       const chatArea = document.getElementById('chatArea');
       const messageDiv = document.createElement('div');
-      messageDiv.className = isUser
+      messageDiv.className = isUser 
         ? 'flex justify-end fade-in mt-2'
         : 'flex items-start space-x-3 fade-in mt-2';
 
-      if (isUser) {
+      if (isUser ) {
         messageDiv.innerHTML = `
           <div class="user-message p-3 rounded-lg shadow max-w-md break-words">
             ${content}
